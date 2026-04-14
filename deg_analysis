@@ -1,0 +1,14 @@
+library(DESeq2)
+  
+cts <- read.table("counts_sulf_merged_updated.txt",header=T,row.names=1)
+countTable <- cts[,-1]
+samples <- data.frame(row.names=colnames(countTable), condition=as.factor(c(rep("d1_mgt",3),rep("d3_sichst7",3),rep("d3_mgt",3)
+                                                                            ,rep("d0_sichst7",3),rep("d0_mgt",3),rep("d1_sichst7",3))))
+
+bckCDS <- DESeqDataSetFromMatrix(countData = countTable, colData=samples, design=~condition)
+dds <- DESeq(bckCDS)
+res <- results(dds)
+
+write.csv(results(dds, contrast=c("condition","d0_sichst7","d0_mgt")),"d0_sichst7_mgt_de.csv")
+write.csv(results(dds, contrast=c("condition","d1_sichst7","d1_mgt")),"d1_sichst7_mgt_de.csv")
+write.csv(results(dds, contrast=c("condition","d3_sichst7","d3_mgt")),"d3_sichst7_mgt_de.csv")
