@@ -1,0 +1,35 @@
+for folder in /directory/fastq/*
+do
+	fol=$(echo "$folder" | tail -c 4) 
+	./bowtie2 --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -p 16 -I 10 -X 700 -x /directory/mm10 -1 "$folder"/*L001*R1*.fastq.gz -2 "$folder"/*L001*R2*.fastq.gz -S /Volumes/sean_transfer/"$fol"L1.bam
+	./bowtie2 --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -p 16 -I 10 -X 700 -x /directory/mm10 -1 "$folder"/*L002*R1*.fastq.gz -2 "$folder"/*L002*R2*.fastq.gz -S /Volumes/sean_transfer/"$fol"L2.bam
+done
+
+cd /Volumes/sean_transfer/chst7_cutnrun
+samtools merge C1.bam C1L1.bam C1L2.bam
+samtools merge C2.bam C2L1.bam C2L2.bam
+samtools merge C3.bam C3L1.bam C3L2.bam
+samtools merge C5.bam C5L1.bam C5L2.bam
+samtools merge C6.bam C6L1.bam C6L2.bam
+samtools merge C7.bam C7L1.bam C7L2.bam
+samtools merge C8.bam C7L1.bam C8L2.bam
+samtools merge C9.bam C9L1.bam C9L2.bam
+samtools merge C10.bam C10L1.bam C10L2.bam
+samtools merge C11.bam C11L1.bam C11L2.bam
+samtools merge C12.bam C12L1.bam C12L2.bam
+
+
+cd /directory/
+for file in *.bam
+do
+	bedtools bamtobed -bedpe -i "$file" > "$file".bed 
+	awk '$1==$4 && $6-$2 < 1000 {print $0}' "$file".bed  > "$file".clean.bed 
+	cut -f 1,2,6 "$file".clean.bed  | sort -k1,1 -k2,2n -k3,3n > "$file".fragments.bed 
+	bedtools genomecov -bg -i "$file".fragments.bed -g /directory/mm10.chrom.sizes.txt > "$file".bedgraph
+done
+
+
+for file in *_sorted.bam
+do
+	macs3 callpeak -t "$file" -q 0.01 -g mm -f BAMPE -B -n "$file"
+done
