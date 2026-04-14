@@ -1,0 +1,30 @@
+cd /Users/CKlab/Documents/HISAT2_HOME
+
+for folder in /directory/* #this paired end data was separated by folders 
+do
+	fol=$(echo "$folder" | tail -c 17) #
+	./hisat2 -q -x /Users/CKlab/Documents/HISAT2_HOME/mouse_genome/genome -1 "$folder"/*R1_001.fastq.gz -2 "$folder"/*R2_001.fastq.gz -S /Users/CKlab/"$fol".sam
+done
+
+cd /Users/CKlab/clones_sam/sulf
+samtools merge 1_D0_siChst7_1.sam 1_D0_siChst7_1_L001.sam 1_D0_siChst7_1_L002.sam
+samtools merge 2_D0_siChst7_2.sam 2_D0_siChst7_2_L001.sam 2_D0_siChst7_2_L002.sam
+samtools merge 3_D0_siChst7_3.sam 3_D0_siChst7_3_L001.sam 3_D0_siChst7_3_L002.sam
+samtools merge 4_D0_MGT_1.sam 4_D0_MGT_1_L001.sam 4_D0_MGT_1_L002.sam
+samtools merge 5_D0_MGT_2.sam 5_D0_MGT_2_L001.sam 5_D0_MGT_2_L002.sam
+samtools merge 6_D0_MGT_3.sam 6_D0_MGT_3_L001.sam 6_D0_MGT_3_L002.sam
+samtools merge 7_D1_siChst7_1.sam 7_D1_siChst7_1_Lane1.sam 7_D1_siChst7_1_Lane2.sam
+samtools merge 8_D1_siChst7_2.sam 8_D1_siChst7_2_L001.sam 8_D1_siChst7_2_L002.sam
+samtools merge 9_D1_siChst7_3.sam 9_D1_siChst7_3_L001.sam 9_D1_siChst7_3_L002.sam
+samtools merge 10_D1_MGT_1.sam 10_D1_MGT_1_L001.sam 10_D1_MGT_1_Lane2.sam
+samtools merge 11_D1_MGT_2.sam 11_D1_MGT_2_L001.sam 11_D1_MGT_2_L002.sam
+samtools merge 12_D1_MGT_3.sam 12_D1_MGT_3_L001.sam 12_D1_MGT_3_L002.sam
+samtools merge 13_D3_siChst7_1.sam 13_D3_siChst7_1_Lane1.sam 13_D3_siChst7_1_Lane2.sam
+samtools merge 14_D3_siChst7_2.sam 14_D3_siChst7_2_L001.sam 14_D3_siChst7_2_L002.sam
+samtools merge 15_D3_siChst7_3.sam 15_D3_siChst7_3_L001.sam 15_D3_siChst7_3_L002.sam
+samtools merge 16_D3_MGT_1.sam 16_D3_MGT_1_L001.sam 16_D3_MGT_1_L002.sam
+samtools merge 17_D3_MGT_2.sam 17_D3_MGT_2_L001.sam 17_D3_MGT_2_L002.sam
+samtools merge 18_D3_MGT_3.sam 18_D3_MGT_3_L001.sam 18_D3_MGT_3_L002.sam
+
+cd /Users/CKlab/Documents/subread/bin
+./featureCounts -t exon -g gene_id -a RefFlat_mm10.gtf -o counts_sulf.txt /directory/*.sam
