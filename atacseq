@@ -1,0 +1,29 @@
+
+for folder in /directory/* 
+do
+	fol=$(echo "$folder" | tail -c 3) 
+	./bowtie2 -p 16 -x /directory/mm10 -1 "$folder"/*L001*R1*.fastq.gz -2 "$folder"/*L001*R2*.fastq.gz -S /directory/"$fol"L1.bam
+	./bowtie2 -p 16 -x /directory/mm10 -1 "$folder"/*L002*R1*.fastq.gz -2 "$folder"/*L002*R2*.fastq.gz -S /directory/"$fol"L2.bam
+done
+
+
+cd /directory/bam
+samtools merge A1.bam A1L1.bam A1L2.bam
+samtools merge A2.bam A2L1.bam A2L2.bam
+samtools merge B1.bam B1L1.bam B1L2.bam
+samtools merge B2.bam B2L1.bam B2L2.bam
+
+samtools sort A1.bam > A1_sorted.bam
+samtools sort A2.bam > A2_sorted.bam
+samtools sort B1.bam > B1_sorted.bam
+samtools sort B2.bam > B2_sorted.bam
+
+samtools index A1_sorted.bam
+samtools index A2_sorted.bam
+samtools index B1_sorted.bam
+samtools index B2_sorted.bam
+
+for file in *_sorted.bam
+do
+	macs3 callpeak -t "$file" -q 0.01 -g mm -f BAMPE -B -n "$file"
+done
